@@ -2,8 +2,6 @@ package swipedelete.swipedelete;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,7 +21,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    public static ArrayList<Model_images> allImages = new ArrayList<>();
+    public static ArrayList<Model_images> al_images = new ArrayList<>();
     boolean boolean_folder;
     Adapter_PhotosFolder obj_adapter;
     GridView gv_folder;
@@ -33,41 +31,36 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        gv_folder = (GridView)findViewById(R.id.gv_folder);
+        gv_folder = findViewById(R.id.gv_folder);
 
         gv_folder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
-                intent.putExtra("value",i);
+                intent.putExtra("value", i);
                 startActivity(intent);
             }
         });
 
-        //Request permissions to access storage
-        if ((ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
-            if ((ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) && (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE))) {
-
-            } else {
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                        REQUEST_PERMISSIONS);
-            }
-        }else {
-            Log.e("Else","Else");
-            fn_imagespath();
+        //If the app does not have permission to write and read external storage
+        if ((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED))
+        {
+            if ((!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) || (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)))
+                {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS);
+                }
         }
-
-
+        //If the app does have permission to write and read external storage
+        else
+            {
+            FindImagePaths();
+            }
 
     }
 
-    public ArrayList<Model_images> fn_imagespath() {
-        allImages.clear();
+    public ArrayList<Model_images> FindImagePaths()
+    {
+        al_images.clear();
 
         int int_position = 0;
         Uri uri;
@@ -84,13 +77,14 @@ public class MainActivity extends AppCompatActivity {
 
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+
         while (cursor.moveToNext()) {
             absolutePathOfImage = cursor.getString(column_index_data);
             Log.e("Column", absolutePathOfImage);
             Log.e("Folder", cursor.getString(column_index_folder_name));
 
-            for (int i = 0; i < allImages.size(); i++) {
-                if (allImages.get(i).getStr_folder().equals(cursor.getString(column_index_folder_name))) {
+            for (int i = 0; i < al_images.size(); i++) {
+                if (al_images.get(i).getStr_folder().equals(cursor.getString(column_index_folder_name))) {
                     boolean_folder = true;
                     int_position = i;
                     break;
@@ -99,13 +93,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-
             if (boolean_folder) {
 
                 ArrayList<String> al_path = new ArrayList<>();
-                al_path.addAll(allImages.get(int_position).getAl_imagepath());
+                al_path.addAll(al_images.get(int_position).getAl_imagepath());
                 al_path.add(absolutePathOfImage);
-                allImages.get(int_position).setAl_imagepath(al_path);
+                al_images.get(int_position).setAl_imagepath(al_path);
 
             } else {
                 ArrayList<String> al_path = new ArrayList<>();
@@ -114,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 obj_model.setStr_folder(cursor.getString(column_index_folder_name));
                 obj_model.setAl_imagepath(al_path);
 
-                allImages.add(obj_model);
+                al_images.add(obj_model);
 
 
             }
@@ -122,30 +115,40 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-        for (int i = 0; i < allImages.size(); i++) {
-            Log.e("FOLDER", allImages.get(i).getStr_folder());
-            for (int j = 0; j < allImages.get(i).getAl_imagepath().size(); j++) {
-                Log.e("FILE", allImages.get(i).getAl_imagepath().get(j));
+        for (int i = 0; i < al_images.size(); i++) {
+            Log.e("FOLDER", al_images.get(i).getStr_folder());
+            for (int j = 0; j < al_images.get(i).getAl_imagepath().size(); j++) {
+                Log.e("FILE", al_images.get(i).getAl_imagepath().get(j));
             }
         }
-        obj_adapter = new Adapter_PhotosFolder(getApplicationContext(),allImages);
+        obj_adapter = new Adapter_PhotosFolder(getApplicationContext(), al_images);
         gv_folder.setAdapter(obj_adapter);
-        return allImages;
+        return al_images;
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    //The result on requesting permissions
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        boolean allResultsGranted = true;
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
             case REQUEST_PERMISSIONS: {
-                for (int i = 0; i < grantResults.length; i++) {
-                    if (grantResults.length > 0 && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                        fn_imagespath();
-                    } else {
-                        Toast.makeText(MainActivity.this, "The app was not allowed to read or write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                for (int i = 0; i < grantResults.length; i++)
+                {
+                    //If the permissions are granted upon request
+                    if (grantResults.length > 0 && grantResults[i] != PackageManager.PERMISSION_GRANTED)
+                    {
+                        allResultsGranted = false;
+                        Toast.makeText(MainActivity.this, "The app is unable to function correctly as you have denied storage access permissions", Toast.LENGTH_LONG).show();
                     }
+                }
+
+                if(allResultsGranted)
+                {
+                    FindImagePaths();
                 }
             }
         }
