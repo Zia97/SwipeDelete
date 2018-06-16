@@ -20,47 +20,57 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
-    public static ArrayList<Model_images> al_images = new ArrayList<>();
+public class MainActivity extends AppCompatActivity
+{
+    public static ArrayList<FolderModel> allFolders = new ArrayList<>();
     boolean boolean_folder;
+    boolean onCreateCalled = false;
     Adapter_PhotosFolder obj_adapter;
-    GridView gv_folder;
+    GridView gridViewFolderHolder;
     private static final int REQUEST_PERMISSIONS = 100;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
+        onCreateCalled = true;
         setContentView(R.layout.activity_main);
-        gv_folder = findViewById(R.id.gv_folder);
+        gridViewFolderHolder = findViewById(R.id.gv_folder);
 
-        gv_folder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridViewFolderHolder.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
                 Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
                 intent.putExtra("value", i);
                 startActivity(intent);
             }
         });
 
+        CheckPermissions();
+    }
+
+    private void CheckPermissions()
+    {
         //If the app does not have permission to write and read external storage
         if ((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED))
         {
             if ((!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) || (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)))
-                {
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS);
-                }
+            {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS);
+            }
         }
         //If the app does have permission to write and read external storage
-        else
-            {
+        else {
             FindImagePaths();
-            }
-
+        }
     }
 
-    public ArrayList<Model_images> FindImagePaths()
+
+    public ArrayList<FolderModel> FindImagePaths()
     {
-        al_images.clear();
+        allFolders.clear();
 
         int int_position = 0;
         Uri uri;
@@ -78,56 +88,53 @@ public class MainActivity extends AppCompatActivity {
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
-        while (cursor.moveToNext()) {
+        //While there is more data
+        while (cursor.moveToNext())
+        {
+            //Get absolute path of image
             absolutePathOfImage = cursor.getString(column_index_data);
-            Log.e("Column", absolutePathOfImage);
-            Log.e("Folder", cursor.getString(column_index_folder_name));
 
-            for (int i = 0; i < al_images.size(); i++) {
-                if (al_images.get(i).getStr_folder().equals(cursor.getString(column_index_folder_name))) {
+            for (int i = 0; i <  allFolders.size(); i++)
+            {
+                //Check collection of all folders and see if the current image belongs to that folder
+                if (allFolders.get(i).getFolderName().equals(cursor.getString(column_index_folder_name)))
+                {
                     boolean_folder = true;
                     int_position = i;
                     break;
-                } else {
+                } else
+                    {
                     boolean_folder = false;
                 }
             }
 
-            if (boolean_folder) {
-
-                ArrayList<String> al_path = new ArrayList<>();
-                al_path.addAll(al_images.get(int_position).getAl_imagepath());
-                al_path.add(absolutePathOfImage);
-                al_images.get(int_position).setAl_imagepath(al_path);
-
-            } else {
-                ArrayList<String> al_path = new ArrayList<>();
-                al_path.add(absolutePathOfImage);
-                Model_images obj_model = new Model_images();
-                obj_model.setStr_folder(cursor.getString(column_index_folder_name));
-                obj_model.setAl_imagepath(al_path);
-
-                al_images.add(obj_model);
-
-
+            //If image belongs to that folder
+            if (boolean_folder)
+            {
+                //Add the image to the folder
+                allFolders.get(int_position).getImagePaths().add(absolutePathOfImage);
             }
+            else
+            {
+                //Create a new folder model and add the image to that folder
+                ArrayList<String> imagePathsInFolder = new ArrayList<>();
+                imagePathsInFolder.add(absolutePathOfImage);
+                FolderModel newFolderModel = new FolderModel();
+                newFolderModel.setFolderName(cursor.getString(column_index_folder_name));
+                newFolderModel.setImagePaths(imagePathsInFolder);
 
+                allFolders.add(newFolderModel);
+            }
 
         }
 
-        for (int i = 0; i < al_images.size(); i++) {
-            Log.e("FOLDER", al_images.get(i).getStr_folder());
-            for (int j = 0; j < al_images.get(i).getAl_imagepath().size(); j++) {
-                Log.e("FILE", al_images.get(i).getAl_imagepath().get(j));
-            }
-        }
-        obj_adapter = new Adapter_PhotosFolder(getApplicationContext(), al_images);
-        gv_folder.setAdapter(obj_adapter);
-        return al_images;
+        obj_adapter = new Adapter_PhotosFolder(getApplicationContext(),  allFolders);
+        gridViewFolderHolder.setAdapter(obj_adapter);
+        return  allFolders;
     }
 
     @Override
-    //The result on requesting permissions
+    //The result when requesting permissions
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
     {
         boolean allResultsGranted = true;
