@@ -49,16 +49,23 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     }
 
     @Override
-    public int getViewTypeCount() {
-        if (al_menu.get(int_position).getImagePaths().size() > 0) {
+    public int getViewTypeCount()
+    {
+        if (al_menu.get(int_position).getImagePaths().size() > 0)
+        {
             return al_menu.get(int_position).getImagePaths().size();
-        } else {
+        } else
+            {
             return 1;
         }
     }
 
     @Override
-    public long getItemId(int position) {
+    public long getItemId(int position)
+    {
+         Log.e("PATH@@@@@@@@", ""+al_menu.get(int_position).getImagePaths());
+         Log.e("selectedpic",""+al_menu.get(int_position).getImagePaths().get(position));
+        Glide.with(context).load(al_menu.get(int_position).getImagePaths().get(position)).skipMemoryCache(false).into(viewHolder.iv_image);
         return position;
     }
 
@@ -66,16 +73,13 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
     {
-
         if (convertView == null)
         {
-
             viewHolder = new ViewHolder();
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.adapter_photosfolder, parent, false);
             viewHolder.tv_foldern = (TextView) convertView.findViewById(R.id.tv_folder);
             viewHolder.tv_foldersize = (TextView) convertView.findViewById(R.id.tv_folder2);
             viewHolder.iv_image = (ImageView) convertView.findViewById(R.id.iv_image);
-
 
             convertView.setTag(viewHolder);
         }
@@ -94,7 +98,6 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
                 .skipMemoryCache(true)
                 .into(viewHolder.iv_image);
 
-
         return convertView;
 
     }
@@ -103,8 +106,6 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     {
         TextView tv_foldern, tv_foldersize;
         ImageView iv_image;
-
-
     }
 
 

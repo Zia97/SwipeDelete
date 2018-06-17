@@ -3,6 +3,7 @@ package swipedelete.swipedelete;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.GridView;
 
 public class PhotosActivity extends AppCompatActivity
@@ -20,5 +21,6 @@ public class PhotosActivity extends AppCompatActivity
         int_position = getIntent().getIntExtra("value", 0);
         adapter = new GridViewAdapter(this,MainActivity. allFolders, int_position);
         gridView.setAdapter(adapter);
+        Log.e("posclicked","####"+int_position);
     }
 }

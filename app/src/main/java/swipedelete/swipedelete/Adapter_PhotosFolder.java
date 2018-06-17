@@ -88,6 +88,7 @@ public class Adapter_PhotosFolder extends ArrayAdapter<FolderModel> {
                 .skipMemoryCache(true)
                 .into(viewHolder.iv_image);
 
+
         return convertView;
 
     }
