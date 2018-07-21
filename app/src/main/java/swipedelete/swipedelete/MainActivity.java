@@ -18,6 +18,12 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
@@ -29,6 +35,8 @@ public class MainActivity extends AppCompatActivity
     GridView gridViewFolderHolder;
     private static final int REQUEST_PERMISSIONS = 100;
 
+    private AdView mAdView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -36,6 +44,9 @@ public class MainActivity extends AppCompatActivity
         onCreateCalled = true;
         setContentView(R.layout.activity_main);
         gridViewFolderHolder = findViewById(R.id.gv_folder);
+
+        //Initialise adds
+        MobileAds.initialize(this, "ca-app-pub-1994840857400080/7051857651");
 
         gridViewFolderHolder.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -47,6 +58,11 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
+
+        //Load adds
+        mAdView = findViewById(R.id.adViewXML);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         CheckPermissions();
     }

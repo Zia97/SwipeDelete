@@ -34,6 +34,8 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
         this.int_position = int_position;
 
 
+
+
     }
 
     @Override
@@ -63,8 +65,8 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     @Override
     public long getItemId(int position)
     {
-         Log.e("PATH@@@@@@@@", ""+al_menu.get(int_position).getImagePaths());
-         Log.e("selectedpic",""+al_menu.get(int_position).getImagePaths().get(position));
+//         Log.e("PATH@@@@@@@@", ""+al_menu.get(int_position).getImagePaths());
+//         Log.e("selectedpic",""+al_menu.get(int_position).getImagePaths().get(position));
         Glide.with(context).load(al_menu.get(int_position).getImagePaths().get(position)).skipMemoryCache(false).into(viewHolder.iv_image);
         return position;
     }

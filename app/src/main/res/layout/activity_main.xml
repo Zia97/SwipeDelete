@@ -11,7 +11,18 @@
         android:id="@+id/gv_folder"
         android:numColumns="2"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"></GridView>
+        android:layout_marginRight="10dp">
+    </GridView>
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adViewXML"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-1994840857400080/7051857651">
+    </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>
