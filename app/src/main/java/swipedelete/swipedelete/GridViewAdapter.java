@@ -2,19 +2,27 @@ package swipedelete.swipedelete;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.provider.ContactsContract;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,16 +34,13 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     ArrayList<FolderModel> al_menu = new ArrayList<>();
     int int_position;
 
+    private ImageSwitcher imageSwitcher;
 
     public GridViewAdapter(Context context, ArrayList<FolderModel> al_menu,int int_position) {
         super(context, R.layout.adapter_photosfolder, al_menu);
         this.al_menu = al_menu;
         this.context = context;
         this.int_position = int_position;
-
-
-
-
     }
 
     @Override
@@ -65,9 +70,9 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     @Override
     public long getItemId(int position)
     {
-//         Log.e("PATH@@@@@@@@", ""+al_menu.get(int_position).getImagePaths());
-//         Log.e("selectedpic",""+al_menu.get(int_position).getImagePaths().get(position));
-        Glide.with(context).load(al_menu.get(int_position).getImagePaths().get(position)).skipMemoryCache(false).into(viewHolder.iv_image);
+        Intent intent = new Intent(context.getApplicationContext(), swipedelete.swipedelete.ImageSwitcher.class);
+        intent.addCategory(al_menu.get(int_position).getImagePaths().get(position));
+        context.startActivity(intent);
         return position;
     }
 
