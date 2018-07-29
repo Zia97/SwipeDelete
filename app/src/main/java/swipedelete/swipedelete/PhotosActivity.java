@@ -10,8 +10,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
-public class PhotosActivity extends AppCompatActivity
-{
+public class PhotosActivity extends AppCompatActivity {
     int int_position;
     private GridView gridView;
     GridViewAdapter adapter;
@@ -23,12 +22,11 @@ public class PhotosActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        gridView = (GridView)findViewById(R.id.gv_folder);
+        gridView = (GridView) findViewById(R.id.gv_folder);
         int_position = getIntent().getIntExtra("value", 0);
-        adapter = new GridViewAdapter(this,MainActivity. allFolders, int_position);
+        adapter = new GridViewAdapter(this, MainActivity.allFolders, int_position);
         gridView.setAdapter(adapter);
-        Log.e("posclicked","####"+int_position);
-
+        Log.e("posclicked", "####" + int_position);
 
         //Load adds
         mAdView = findViewById(R.id.adViewXML);

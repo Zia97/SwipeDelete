@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -82,13 +83,15 @@ public class Adapter_PhotosFolder extends ArrayAdapter<FolderModel> {
         viewHolder.tv_foldern.setText(al_menu.get(position).getFolderName());
         viewHolder.tv_foldersize.setText(al_menu.get(position).getImagePaths().size()+"");
 
+        File tempFile = new File(al_menu.get(position).getImagePaths().get(0));
 
-        Glide.with(context).load(al_menu.get(position).getImagePaths().get(0))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(viewHolder.iv_image);
-
-
+        if(tempFile.exists())
+        {
+            Glide.with(context).load(al_menu.get(position).getImagePaths().get(0))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(viewHolder.iv_image);
+        }
         return convertView;
 
     }

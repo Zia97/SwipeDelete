@@ -72,7 +72,9 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     {
         Intent intent = new Intent(context.getApplicationContext(), swipedelete.swipedelete.ImageSwitcher.class);
         intent.addCategory(al_menu.get(int_position).getImagePaths().get(position));
+        intent.putExtra("Folder",int_position);
         context.startActivity(intent);
+
         return position;
     }
 
@@ -98,12 +100,15 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
         viewHolder.tv_foldern.setVisibility(View.GONE);
         viewHolder.tv_foldersize.setVisibility(View.GONE);
 
+        File tempFile = new File(al_menu.get(int_position).getImagePaths().get(position));
 
-
-        Glide.with(context).load( al_menu.get(int_position).getImagePaths().get(position))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(viewHolder.iv_image);
+        if(tempFile.exists())
+        {
+            Glide.with(context).load(al_menu.get(int_position).getImagePaths().get(position))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(viewHolder.iv_image);
+        }
 
         return convertView;
 

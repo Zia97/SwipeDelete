@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-      //  <activity android:name=".PhotosActivity"></activity>
+      //  <activity android:name=".PhotosActivity" android:launchMode="singleTask"></activity>
         //  <activity android:name=".ImageSwitcher" android:launchMode="singleTask"></activity>
 
 
