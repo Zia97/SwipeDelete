@@ -1,29 +1,24 @@
 package swipedelete.swipedelete;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ScaleDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.android.gms.ads.AdRequest;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
+
 
 public class ImageSwitcher extends AppCompatActivity {
 
@@ -73,6 +68,18 @@ public class ImageSwitcher extends AppCompatActivity {
 
         File[] files = directory.listFiles();
 
+        Collections.sort(Arrays.asList(files), new FileComparator());
+
+        Collections.reverse(Arrays.asList(files));
+
+        for (File item : files)
+        {
+            Log.v("ord",item.getName()+"     "+item.lastModified());
+        }
+
+
+
+
         for (int i = 0; i < files.length; i++)
         {
             if(files[i].toString().endsWith("jpg") || files[i].toString().endsWith("png") || files[i].toString().endsWith("gif") || files[i].toString().endsWith("jpeg"))
@@ -82,7 +89,6 @@ public class ImageSwitcher extends AppCompatActivity {
                     currentPositionInPhotoArray = i;
                 }
 
-                Log.e("@@@@", files[i].toString());
                 allImagesInFolder.add(files[i].toString());
             }
         }
