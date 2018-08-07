@@ -64,7 +64,6 @@ public class ImageSwitcher extends AppCompatActivity {
 
     private void GetAllImagesInFolder()
     {
-        Log.e("hit", "getallimages hit");
         File directory = new File(imageFolder);
 
         File[] files = directory.listFiles();
