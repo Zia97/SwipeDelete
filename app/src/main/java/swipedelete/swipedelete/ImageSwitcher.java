@@ -64,6 +64,7 @@ public class ImageSwitcher extends AppCompatActivity {
 
     private void GetAllImagesInFolder()
     {
+        Log.e("hit", "getallimages hit");
         File directory = new File(imageFolder);
 
         File[] files = directory.listFiles();
@@ -72,19 +73,11 @@ public class ImageSwitcher extends AppCompatActivity {
 
         Collections.reverse(Arrays.asList(files));
 
-        for (File item : files)
-        {
-            Log.v("ord",item.getName()+"     "+item.lastModified());
-        }
-
-
-
-
         for (int i = 0; i < files.length; i++)
         {
             if(files[i].toString().endsWith("jpg") || files[i].toString().endsWith("png") || files[i].toString().endsWith("gif") || files[i].toString().endsWith("jpeg"))
             {
-                if(files[i].equals(imagePath))
+                if(files[i].toString().equals(imagePath))
                 {
                     currentPositionInPhotoArray = i;
                 }
