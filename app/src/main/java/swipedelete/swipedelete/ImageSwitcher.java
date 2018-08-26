@@ -1,6 +1,7 @@
 package swipedelete.swipedelete;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 
 
@@ -35,7 +37,7 @@ public class ImageSwitcher extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_switcher_xml);
         imageView = findViewById(R.id.imageViewXML);
-        //imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        imageView.setBackgroundColor(Color.rgb(0, 0, 0));
 
 
         Set<String> imagePaths = getIntent().getCategories();
@@ -47,6 +49,7 @@ public class ImageSwitcher extends AppCompatActivity {
         if (imagePathArray.length == 1)
         {
             imagePath = imagePathArray[0].toString();
+            Log.e("test", imagePath);
 
             File tempFile = new File(imagePath);
             imageFolder = tempFile.getParent();
@@ -72,16 +75,23 @@ public class ImageSwitcher extends AppCompatActivity {
 
         Collections.reverse(Arrays.asList(files));
 
-        for (int i = 0; i < files.length; i++)
+        for (int i = 0; i <files.length; i++)
         {
-            if(files[i].toString().endsWith("jpg") || files[i].toString().endsWith("png") || files[i].toString().endsWith("gif") || files[i].toString().endsWith("jpeg"))
+            if(files[i].toString().endsWith("jpg") || files[i].toString().endsWith("png") || files[i].toString().endsWith("gif") || files[i].toString().endsWith("jpeg") || files[i].toString().endsWith("bmp")|| files[i].toString().endsWith("webp") || files[i].toString().endsWith("JPG"))
             {
-                if(files[i].toString().equals(imagePath))
-                {
-                    currentPositionInPhotoArray = i;
-                }
-
                 allImagesInFolder.add(files[i].toString());
+//                Date dt1 = new Date(files[i].lastModified());
+//                Log.e("Name",files[i].getName()+"   "+dt1);
+            }
+        }
+
+        for(int i=0; i<allImagesInFolder.size(); i++)
+        {
+            if(allImagesInFolder.get(i).toString().equals(imagePath))
+            {
+                Log.e("path", imagePath);
+                currentPositionInPhotoArray = i;
+                Log.e("filelength", currentPositionInPhotoArray+" @@@");
             }
         }
     }
@@ -97,12 +107,15 @@ public class ImageSwitcher extends AppCompatActivity {
     @Override
     public void onBackPressed()
     {
-        super.onBackPressed();
         allImagesInFolder.clear();
         finish();
-        Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
-        intent.putExtra("value",folderPosition);
-        startActivity(intent);
+
+////        Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
+////        intent.putExtra("value",folderPosition);
+////        startActivity(intent);
+//
+
+
     }
 
     public void deleteButtonClicked(View view)
@@ -111,14 +124,13 @@ public class ImageSwitcher extends AppCompatActivity {
 
         boolean deleted = file.delete();
 
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-
         if(!deleted)
         {
             Log.e("Error","File was not deleted");
         }
         else
         {
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
             Toast.makeText(this.getApplicationContext(),"Deleted", Toast.LENGTH_SHORT).show();
         }
         allImagesInFolder.remove(currentPositionInPhotoArray);
@@ -143,7 +155,7 @@ public class ImageSwitcher extends AppCompatActivity {
             currentPositionInPhotoArray = 0;
         }
 
-        Log.e("ret",allImagesInFolder.get(currentPositionInPhotoArray) );
+        Log.e("ret", String.valueOf(currentPositionInPhotoArray));
 
         imagePath = allImagesInFolder.get(currentPositionInPhotoArray);
 

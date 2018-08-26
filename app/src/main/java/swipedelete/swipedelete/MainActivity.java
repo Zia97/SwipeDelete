@@ -24,7 +24,12 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity
 
         String[] projection = {MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
 
-        final String orderBy = MediaStore.Images.Media.DATE_TAKEN;
+        final String orderBy = MediaStore.Images.Media.DATE_MODIFIED ;
         cursor = getApplicationContext().getContentResolver().query(uri, projection, null, null, orderBy + " DESC");
 
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
@@ -143,7 +148,6 @@ public class MainActivity extends AppCompatActivity
             }
 
         }
-
         obj_adapter = new Adapter_PhotosFolder(getApplicationContext(),  allFolders);
         gridViewFolderHolder.setAdapter(obj_adapter);
         return  allFolders;
