@@ -109,13 +109,10 @@ public class ImageSwitcher extends AppCompatActivity {
     {
         allImagesInFolder.clear();
         finish();
-
-////        Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
-////        intent.putExtra("value",folderPosition);
-////        startActivity(intent);
-//
-
-
+//        Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
+//       // intent.putExtra("value", i);
+//        startActivity(intent);
+//        finish();
     }
 
     public void deleteButtonClicked(View view)

@@ -46,8 +46,10 @@ public class Adapter_PhotosFolder extends ArrayAdapter<FolderModel> {
     @Override
     public int getViewTypeCount()
     {
+
         if (al_menu.size() > 0)
         {
+            Log.e("FSIZE", String.valueOf(al_menu.size()));
             return al_menu.size();
         }
         else

@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
                 intent.putExtra("value", i);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -70,6 +71,37 @@ public class MainActivity extends AppCompatActivity
         mAdView.loadAd(adRequest);
 
         CheckPermissions();
+    }
+
+    @Override
+    protected void onRestart()
+    {
+        super.onRestart();
+
+        setContentView(R.layout.activity_main);
+        gridViewFolderHolder = findViewById(R.id.gv_folder);
+
+        //Initialise adds
+//        MobileAds.initialize(this, "ca-app-pub-1994840857400080/7051857651");
+
+        gridViewFolderHolder.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+            {
+                Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
+                intent.putExtra("value", i);
+                startActivity(intent);
+            }
+        });
+
+//        //Load adds
+//        mAdView = findViewById(R.id.adViewXML);
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        mAdView.loadAd(adRequest);
+
+        FindImagePaths();
+       // CheckPermissions();
     }
 
     private void CheckPermissions()
@@ -133,7 +165,10 @@ public class MainActivity extends AppCompatActivity
             if (boolean_folder)
             {
                 //Add the image to the folder
-                allFolders.get(int_position).getImagePaths().add(absolutePathOfImage);
+                if( allFolders.get(int_position).getImagePaths()!=null)
+                {
+                    allFolders.get(int_position).getImagePaths().add(absolutePathOfImage);
+                }
             }
             else
             {

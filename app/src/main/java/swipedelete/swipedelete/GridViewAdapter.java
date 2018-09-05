@@ -34,7 +34,6 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     ArrayList<FolderModel> al_menu = new ArrayList<>();
     int int_position;
 
-    private ImageSwitcher imageSwitcher;
 
     public GridViewAdapter(Context context, ArrayList<FolderModel> al_menu,int int_position) {
         super(context, R.layout.adapter_photosfolder, al_menu);
@@ -44,10 +43,31 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     }
 
     @Override
-    public int getCount() {
+    public int getCount()
+    {
+        int counter =0;
 
         Log.e("ADAPTER LIST SIZE", al_menu.get(int_position).getImagePaths().size() + "");
+        Log.e("ADAPTER LIST NAME", al_menu.get(int_position).getFolderName() + "");
         return al_menu.get(int_position).getImagePaths().size();
+
+
+//        for (int i = 0; i <al_menu.get(int_position).getImagePaths().size(); i++)
+//        {
+//            if(al_menu.get(int_position).getImagePaths().get(i).toString().endsWith("jpg") || al_menu.get(int_position).getImagePaths().get(i).toString().endsWith("png") || al_menu.get(int_position).getImagePaths().get(i).toString().endsWith("gif") || al_menu.get(int_position).getImagePaths().get(i).toString().endsWith("jpeg") || al_menu.get(int_position).getImagePaths().get(i).toString().endsWith("bmp")|| al_menu.get(int_position).getImagePaths().get(i).toString().endsWith("webp") || al_menu.get(int_position).getImagePaths().get(i).toString().endsWith("JPG"))
+//            {
+//                  File tempFile = new File(al_menu.get(int_position).getImagePaths().get(i));
+//
+//                  if(tempFile.exists())
+//                  {
+//                      counter++;
+//                  }
+////                Date dt1 = new Date(files[i].lastModified());
+////                Log.e("Name",files[i].getName()+"   "+dt1);
+//            }
+//        }
+//        return counter;
+//        //return al_menu.get(int_position).getImagePaths().size();
     }
 
     @Override
@@ -60,6 +80,7 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     {
         if (al_menu.get(int_position).getImagePaths().size() > 0)
         {
+            Log.e("viewtypecount", String.valueOf(al_menu.get(int_position).getImagePaths().size()));
             return al_menu.get(int_position).getImagePaths().size();
         } else
             {

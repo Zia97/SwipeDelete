@@ -39,28 +39,3 @@ public class FileComparator implements Comparator<File>
         return 0;
     }
 }
-
-//        attr.creation
-//        Date dt1 = new Date();
-//        Date dt2 = new Date(f1.lastModified());
-
-//        if(date1.compareTo(date2)>0){
-//            System.out.println("Date1 is after Date2");
-//        }else if(date1.compareTo(date2)<0){
-//            System.out.println("Date1 is before Date2");
-//        }else{
-//            System.out.println("Date1 is equal to Date2");
-//        }
-
-
-
-//        if (f0.lastModified() > f1.lastModified())
-//        {
-//            return 1;
-//        }
-//        else if (f1.lastModified() > f0.lastModified())
-//        {
-//            return -1;
-//        }
-
-       // return 0;

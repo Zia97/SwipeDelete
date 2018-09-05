@@ -1,6 +1,7 @@
 package swipedelete.swipedelete;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -21,16 +22,43 @@ public class PhotosActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        gridView = (GridView) findViewById(R.id.gv_folder);
-        int_position = getIntent().getIntExtra("value", 0);
-        adapter = new GridViewAdapter(this, MainActivity.allFolders, int_position);
-        gridView.setAdapter(adapter);
-        Log.e("posclicked", "####" + int_position);
+        SetGridView();
+        LoadAdds();
+    }
 
+
+    @Override
+    protected void onRestart()
+    {
+        super.onRestart();
+        SetGridView();
+
+        Log.e("start","PHOTO ACTIVITY RESTARTED");
+    }
+
+    private void LoadAdds()
+    {
         //Load adds
         mAdView = findViewById(R.id.adViewXML);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
     }
+
+    private void SetGridView()
+    {
+        setContentView(R.layout.activity_main);
+        gridView = (GridView) findViewById(R.id.gv_folder);
+        int_position = getIntent().getIntExtra("value", 0);
+        adapter = new GridViewAdapter(this, MainActivity.allFolders, int_position);
+        gridView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
 }
