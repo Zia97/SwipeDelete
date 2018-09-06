@@ -117,7 +117,7 @@ public class ImageSwitcher extends AppCompatActivity {
 
     public void deleteButtonClicked(View view)
     {
-        GoToNextPicture();
+
         File file = new File(imagePath);
 
         boolean deleted = file.delete();
@@ -131,7 +131,9 @@ public class ImageSwitcher extends AppCompatActivity {
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
             Toast.makeText(this.getApplicationContext(),"Deleted", Toast.LENGTH_SHORT).show();
         }
+        GoToNextPicture();
         allImagesInFolder.remove(currentPositionInPhotoArray);
+
 
     }
 
