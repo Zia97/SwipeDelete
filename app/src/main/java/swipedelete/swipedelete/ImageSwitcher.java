@@ -109,9 +109,12 @@ public class ImageSwitcher extends AppCompatActivity {
     {
         allImagesInFolder.clear();
         finish();
-//        Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
-//       // intent.putExtra("value", i);
+//        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 //        startActivity(intent);
+//        finish();
+ //       Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
+//       // intent.putExtra("value", i);
+ //       startActivity(intent);
 //        finish();
     }
 
