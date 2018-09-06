@@ -1,7 +1,6 @@
 package swipedelete.swipedelete;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ public class Adapter_PhotosFolder extends ArrayAdapter<FolderModel> {
 
     Context context;
     ViewHolder viewHolder;
-    ArrayList<FolderModel> al_menu = new ArrayList<>();
+    ArrayList<FolderModel> al_menu;
 
 
     public Adapter_PhotosFolder(Context context, ArrayList<FolderModel> al_menu)
@@ -33,7 +32,6 @@ public class Adapter_PhotosFolder extends ArrayAdapter<FolderModel> {
     @Override
     public int getCount()
     {
-        Log.e("ADAPTER LIST SIZE", al_menu.size() + "");
         return al_menu.size();
     }
 
@@ -46,10 +44,8 @@ public class Adapter_PhotosFolder extends ArrayAdapter<FolderModel> {
     @Override
     public int getViewTypeCount()
     {
-
         if (al_menu.size() > 0)
         {
-            Log.e("FSIZE", String.valueOf(al_menu.size()));
             return al_menu.size();
         }
         else

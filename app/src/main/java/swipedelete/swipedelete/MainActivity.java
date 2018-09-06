@@ -10,26 +10,18 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdSize;
+
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-
-import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity
 {
@@ -66,9 +58,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         //Load adds
-        mAdView = findViewById(R.id.adViewXML);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        LoadAdds();
 
         CheckPermissions();
     }
@@ -81,9 +71,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         gridViewFolderHolder = findViewById(R.id.gv_folder);
 
-        //Initialise adds
-//        MobileAds.initialize(this, "ca-app-pub-1994840857400080/7051857651");
-
         gridViewFolderHolder.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
@@ -95,13 +82,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-//        //Load adds
-//        mAdView = findViewById(R.id.adViewXML);
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        mAdView.loadAd(adRequest);
 
-        FindImagePaths();
-       // CheckPermissions();
+        LoadAdds();
+
+        CheckPermissions();
     }
 
     private void CheckPermissions()
@@ -118,6 +102,14 @@ public class MainActivity extends AppCompatActivity
         else {
             FindImagePaths();
         }
+    }
+
+    private void LoadAdds()
+    {
+        //Load adds
+        mAdView = findViewById(R.id.adViewXML);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
 
@@ -215,5 +207,4 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
 }

@@ -1,17 +1,14 @@
 package swipedelete.swipedelete;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.GridView;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
@@ -66,6 +63,7 @@ public class PhotosActivity extends AppCompatActivity {
         finish();
     }
 
+    //Deletion of photos may have occurred, reloading photos is required
     private void RegenerateAllFolders()
     {
         boolean boolean_folder = false;
@@ -132,6 +130,7 @@ public class PhotosActivity extends AppCompatActivity {
         }
     }
 
+    //Redraw new grid view accounting for deleted photos
     private void DrawRegeneratedGridView()
     {
         setContentView(R.layout.activity_main);

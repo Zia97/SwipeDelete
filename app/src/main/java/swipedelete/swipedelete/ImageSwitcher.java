@@ -18,7 +18,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Set;
 
 
@@ -49,7 +48,6 @@ public class ImageSwitcher extends AppCompatActivity {
         if (imagePathArray.length == 1)
         {
             imagePath = imagePathArray[0].toString();
-            Log.e("test", imagePath);
 
             File tempFile = new File(imagePath);
             imageFolder = tempFile.getParent();
@@ -80,8 +78,6 @@ public class ImageSwitcher extends AppCompatActivity {
             if(files[i].toString().endsWith("jpg") || files[i].toString().endsWith("png") || files[i].toString().endsWith("gif") || files[i].toString().endsWith("jpeg") || files[i].toString().endsWith("bmp")|| files[i].toString().endsWith("webp") || files[i].toString().endsWith("JPG"))
             {
                 allImagesInFolder.add(files[i].toString());
-//                Date dt1 = new Date(files[i].lastModified());
-//                Log.e("Name",files[i].getName()+"   "+dt1);
             }
         }
 
@@ -89,9 +85,7 @@ public class ImageSwitcher extends AppCompatActivity {
         {
             if(allImagesInFolder.get(i).toString().equals(imagePath))
             {
-                Log.e("path", imagePath);
                 currentPositionInPhotoArray = i;
-                Log.e("filelength", currentPositionInPhotoArray+" @@@");
             }
         }
     }
@@ -109,18 +103,10 @@ public class ImageSwitcher extends AppCompatActivity {
     {
         allImagesInFolder.clear();
         finish();
-//        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//        startActivity(intent);
-//        finish();
- //       Intent intent = new Intent(getApplicationContext(), PhotosActivity.class);
-//       // intent.putExtra("value", i);
- //       startActivity(intent);
-//        finish();
     }
 
     public void deleteButtonClicked(View view)
     {
-
         File file = new File(imagePath);
 
         boolean deleted = file.delete();
@@ -134,10 +120,13 @@ public class ImageSwitcher extends AppCompatActivity {
             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
             Toast.makeText(this.getApplicationContext(),"Deleted", Toast.LENGTH_SHORT).show();
         }
-        GoToNextPicture();
+
         allImagesInFolder.remove(currentPositionInPhotoArray);
-
-
+        if(allImagesInFolder.isEmpty())
+        {
+            onBackPressed();
+        }
+        GoToNextPictureAfterDelete();
     }
 
     public void nextButtonClicked(View view)
@@ -153,6 +142,11 @@ public class ImageSwitcher extends AppCompatActivity {
     private void GoToNextPicture()
     {
         currentPositionInPhotoArray++;
+        if(allImagesInFolder.size()==0)
+        {
+            onBackPressed();
+        }
+
         if(currentPositionInPhotoArray> allImagesInFolder.size()-1)
         {
             currentPositionInPhotoArray = 0;
@@ -168,9 +162,43 @@ public class ImageSwitcher extends AppCompatActivity {
                 .into(imageView);
     }
 
+    private void GoToNextPictureAfterDelete()
+    {
+        if(allImagesInFolder.size()==0)
+        {
+            onBackPressed();
+        }
+
+        if(currentPositionInPhotoArray> allImagesInFolder.size()-1)
+        {
+            currentPositionInPhotoArray = 0;
+        }
+
+
+        try {
+            imagePath = allImagesInFolder.get(currentPositionInPhotoArray);
+            Glide.with(this.getApplicationContext()).load(allImagesInFolder.get(currentPositionInPhotoArray))
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .into(imageView);
+        }
+        catch (Exception e)
+        {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+
+    }
+
     private void GoToPreviousPicture()
     {
         currentPositionInPhotoArray--;
+        if(allImagesInFolder.size()==0)
+        {
+            onBackPressed();
+        }
         if(currentPositionInPhotoArray<0)
         {
             currentPositionInPhotoArray = allImagesInFolder.size()-1;
