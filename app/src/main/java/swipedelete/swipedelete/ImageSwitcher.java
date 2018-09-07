@@ -13,6 +13,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +34,7 @@ public class ImageSwitcher extends AppCompatActivity {
     private static ArrayList<String> allImagesInFolder = new ArrayList<>();
     private int currentPositionInPhotoArray;
     private int folderPosition;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,8 @@ public class ImageSwitcher extends AppCompatActivity {
 
         GetAllImagesInFolder();
         LoadImageIntoImageView();
+        MobileAds.initialize(this, "ca-app-pub-1994840857400080/7051857651");
+        LoadAdds();
 
     }
 
@@ -210,5 +217,13 @@ public class ImageSwitcher extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(true)
                 .into(imageView);
+    }
+
+    private void LoadAdds()
+    {
+        //Load adds
+        mAdView = findViewById(R.id.adViewXML);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 }

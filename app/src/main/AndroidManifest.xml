@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="swipedelete.swipedelete">
+    package="swipedelete.swipedelete"
+    android:versionCode="1"
+    android:versionName="@string/app_name">
+
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
@@ -26,6 +29,8 @@
 
 
 
+
     </application>
+
 
 </manifest>
