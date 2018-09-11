@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -35,6 +37,9 @@ public class ImageSwitcher extends AppCompatActivity {
     private int currentPositionInPhotoArray;
     private int folderPosition;
     private AdView mAdView;
+    private GestureDetector gdt;
+    private static final int MIN_SWIPPING_DISTANCE = 50;
+    private static final int THRESHOLD_VELOCITY = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,35 @@ public class ImageSwitcher extends AppCompatActivity {
         LoadImageIntoImageView();
         MobileAds.initialize(this, "ca-app-pub-1994840857400080/7051857651");
         LoadAdds();
+        gdt = new GestureDetector(new GestureListener());
 
+        imageView.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(final View view, final MotionEvent event) {
+                gdt.onTouchEvent(event);
+                return true;
+            } });
+
+    }
+
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener
+    {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+        {
+            if (e1.getX() - e2.getX() > MIN_SWIPPING_DISTANCE && Math.abs(velocityX) > THRESHOLD_VELOCITY)
+            {
+                GoToNextPicture();
+                return false;
+            }
+            else if (e2.getX() - e1.getX() > MIN_SWIPPING_DISTANCE && Math.abs(velocityX) > THRESHOLD_VELOCITY)
+            {
+                GoToPreviousPicture();
+                return false;
+            }
+            return false;
+        }
     }
 
     private void GetAllImagesInFolder()
