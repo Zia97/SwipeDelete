@@ -14,24 +14,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-
-public class ImageSwitcher extends AppCompatActivity implements Serializable {
-
+public class VideoSwitcher extends AppCompatActivity
+{
+    private VideoView videoView;
     private String imagePath;
     private ImageView imageView;
     private Button deleteButton;
@@ -47,9 +45,10 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.image_switcher_xml);
-        imageView = findViewById(R.id.imageViewXML);
-        imageView.setBackgroundColor(Color.rgb(0, 0, 0));
+        setContentView(R.layout.video_switcher_xml);
+        videoView = findViewById(R.id.videoViewXML);
+        videoView.setBackgroundColor(Color.rgb(0, 0, 0));
+        videoView.setZOrderOnTop(true);
 
 
         Set<String> imagePaths = getIntent().getCategories();
@@ -67,7 +66,7 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
 
         }
         else
-            {
+        {
             Log.e("Path error", "Incorrect number of paths sent on click");
         }
 
@@ -77,7 +76,7 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
 
         gdt = new GestureDetector(new GestureListener());
 
-        imageView.setOnTouchListener(new View.OnTouchListener()
+        videoView.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
             public boolean onTouch(final View view, final MotionEvent event) {
@@ -87,11 +86,31 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
 
     }
 
+    private void LoadImageIntoImageView()
+    {
+        videoView.setVideoPath(imagePath);
+        videoView.start();
+    }
 
+    @Override
+    public void onBackPressed()
+    {
+        allImagesInFolder.clear();
+        finish();
+    }
+
+    private void LoadAdds()
+    {
+        //Load adds
+        mAdView = findViewById(R.id.adViewXML);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+    }
 
     private void GetAllImagesInFolder()
     {
         allImagesInFolder = (ArrayList<String>) getIntent().getSerializableExtra("files");
+
         for(int i=0; i<allImagesInFolder.size(); i++)
         {
             if(allImagesInFolder.get(i).toString().equals(imagePath))
@@ -101,19 +120,23 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
         }
     }
 
-    private void LoadImageIntoImageView()
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener
     {
-        Glide.with(this.getApplicationContext()).load(imagePath)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(imageView);
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        allImagesInFolder.clear();
-        finish();
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+        {
+            if (e1.getX() - e2.getX() > MIN_SWIPPING_DISTANCE && Math.abs(velocityX) > THRESHOLD_VELOCITY)
+            {
+                GoToNextPicture();
+                return false;
+            }
+            else if (e2.getX() - e1.getX() > MIN_SWIPPING_DISTANCE && Math.abs(velocityX) > THRESHOLD_VELOCITY)
+            {
+                GoToPreviousPicture();
+                return false;
+            }
+            return false;
+        }
     }
 
     public void deleteButtonClicked(View view)
@@ -142,7 +165,7 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
 
     public void nextButtonClicked(View view)
     {
-       GoToNextPicture();
+        GoToNextPicture();
     }
 
     public void previousButtonClicked(View view)
@@ -163,14 +186,9 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
             currentPositionInPhotoArray = 0;
         }
 
-        Log.e("ret", String.valueOf(currentPositionInPhotoArray));
-
         imagePath = allImagesInFolder.get(currentPositionInPhotoArray);
 
-        Glide.with(this.getApplicationContext()).load(allImagesInFolder.get(currentPositionInPhotoArray))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(imageView);
+        LoadImageIntoImageView();
     }
 
     private void GoToNextPictureAfterDelete()
@@ -188,10 +206,7 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
 
         try {
             imagePath = allImagesInFolder.get(currentPositionInPhotoArray);
-            Glide.with(this.getApplicationContext()).load(allImagesInFolder.get(currentPositionInPhotoArray))
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .into(imageView);
+            LoadImageIntoImageView();
         }
         catch (Exception e)
         {
@@ -217,36 +232,6 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
 
         imagePath = allImagesInFolder.get(currentPositionInPhotoArray);
 
-        Glide.with(this.getApplicationContext()).load(allImagesInFolder.get(currentPositionInPhotoArray))
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(true)
-                .into(imageView);
-    }
-
-    private void LoadAdds()
-    {
-        //Load adds
-        mAdView = findViewById(R.id.adViewXML);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
-    }
-
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener
-    {
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
-        {
-            if (e1.getX() - e2.getX() > MIN_SWIPPING_DISTANCE && Math.abs(velocityX) > THRESHOLD_VELOCITY)
-            {
-                GoToNextPicture();
-                return false;
-            }
-            else if (e2.getX() - e1.getX() > MIN_SWIPPING_DISTANCE && Math.abs(velocityX) > THRESHOLD_VELOCITY)
-            {
-                GoToPreviousPicture();
-                return false;
-            }
-            return false;
-        }
+        LoadImageIntoImageView();
     }
 }

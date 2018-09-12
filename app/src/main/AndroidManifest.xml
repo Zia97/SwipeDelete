@@ -26,7 +26,7 @@
 
       //  <activity android:name=".PhotosActivity" android:launchMode="singleTask"></activity>
         //  <activity android:name=".ImageSwitcher" android:launchMode="singleTask"></activity>
-
+        //  <activity android:name=".VideoSwitcher" android:launchMode="singleTask"></activity>
 
 
 
