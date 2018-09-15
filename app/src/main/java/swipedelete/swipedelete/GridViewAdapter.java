@@ -25,6 +25,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 
 public class GridViewAdapter extends ArrayAdapter<FolderModel> {
@@ -58,29 +60,13 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
             return al_menu.get(int_position).getImagePaths().size();
         } else {
 
-            return 1;
+            return 0;
         }
     }
 
     @Override
     public long getItemId(int position)
     {
-        if (al_menu.get(int_position).getImagePaths().get(position).toString().endsWith("mp4"))
-        {
-
-            Intent intent = new Intent(context.getApplicationContext(), swipedelete.swipedelete.VideoSwitcher.class);
-            intent.addCategory(al_menu.get(int_position).getImagePaths().get(position));
-            intent.putExtra("Folder", int_position);
-            intent.putExtra("files",al_menu.get(int_position).getImagePaths());
-            context.startActivity(intent);
-        } else
-            {
-            Intent intent = new Intent(context.getApplicationContext(), swipedelete.swipedelete.ImageSwitcher.class);
-            intent.addCategory(al_menu.get(int_position).getImagePaths().get(position));
-            intent.putExtra("Folder", int_position);
-            intent.putExtra("files",al_menu.get(int_position).getImagePaths());
-            context.startActivity(intent);
-        }
         return position;
     }
 
@@ -172,6 +158,30 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     {
         String mimeType = URLConnection.guessContentTypeFromName(path);
         return mimeType != null && mimeType.startsWith("image");
+    }
+
+    private HashMap<Integer, Boolean> mSelection = new HashMap<Integer, Boolean>();
+    public void setNewSelection(int position, boolean value)
+    {
+        mSelection.put(position, value);
+    }
+
+    public boolean isPositionChecked(int position)
+    {
+        Boolean result = mSelection.get(position);
+        return result == null ? false : result;
+    }
+
+    public Set<Integer> getCurrentCheckedPosition() {
+        return mSelection.keySet();
+    }
+
+    public void removeSelection(int position) {
+        mSelection.remove(position);
+    }
+
+    public void clearSelection() {
+        mSelection = new HashMap<Integer, Boolean>();
     }
 
 

@@ -1,17 +1,40 @@
 package swipedelete.swipedelete;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Application;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.io.File;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PhotosActivity extends AppCompatActivity {
     int int_position;
@@ -21,6 +44,9 @@ public class PhotosActivity extends AppCompatActivity {
     public static ArrayList<FolderModel> allFolders = new ArrayList<>();
     public static ArrayList<FolderModel> allVideoFolders = new ArrayList<>();
     boolean boolean_folder;
+    public static ArrayList<Integer> selectedPositions = new ArrayList<>();
+    private MultiChoiceModeListener multiChoiceModeListener = new MultiChoiceModeListener();
+    private ActionMode _actionMode;
 
     private AdView mAdView;
 
@@ -28,8 +54,22 @@ public class PhotosActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        //Removed regen all folders
+        allFolders = MainActivity.allFolders;
         SetGridView();
         LoadAdds();
+        SetClickListeners();
+
+    }
+
+    private void SetClickListeners()
+    {
+        gridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        gridView.setOnItemClickListener(new OnItemClickListener());
+
+        gridView.setMultiChoiceModeListener(multiChoiceModeListener);
     }
 
 
@@ -37,8 +77,10 @@ public class PhotosActivity extends AppCompatActivity {
     protected void onRestart()
     {
         super.onRestart();
+        allFolders.clear();
         RegenerateAllFolders();
         DrawRegeneratedGridView();
+        SetClickListeners();
     }
 
     private void LoadAdds()
@@ -205,6 +247,139 @@ public class PhotosActivity extends AppCompatActivity {
         int_position = getIntent().getIntExtra("value", 0);
         adapter = new GridViewAdapter(this, allFolders, int_position);
         gridView.setAdapter(adapter);
+
+
+    }
+
+    public void PhotoActivityDeleteButtonClicked(MenuItem item)
+    {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle("Confirm choice");
+        builder.setMessage("Are you sure you want to delete the "+gridView.getCheckedItemCount()+" items?");
+        builder.setPositiveButton("Confirm",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        for(int position : selectedPositions)
+                        {
+                            String filePath = allFolders.get(int_position).getImagePaths().get(position);
+
+                            File file = new File(filePath);
+
+                            boolean deleted = file.delete();
+
+                            if (!deleted) {
+                                Log.e("Error", "File was not deleted");
+                            } else {
+                                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+                            }
+                        }
+                        selectedPositions.clear();
+                        multiChoiceModeListener.onDestroyActionMode(_actionMode);
+                    }
+                });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+            }
+        });
+        builder.show();
+    }
+
+    public class OnItemClickListener implements AdapterView.OnItemClickListener {
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+        {
+            if (isImageFile(allFolders.get(int_position).getImagePaths().get(position)))
+            {
+                Intent intent = new Intent(getApplicationContext(), swipedelete.swipedelete.ImageSwitcher.class);
+                intent.addCategory(allFolders.get(int_position).getImagePaths().get(position));
+                intent.putExtra("Folder", int_position);
+                intent.putExtra("files",allFolders.get(int_position).getImagePaths());
+                startActivity(intent);
+            }
+            else
+            {
+                Intent intent = new Intent(getApplicationContext(), swipedelete.swipedelete.VideoSwitcher.class);
+                intent.addCategory(allFolders.get(int_position).getImagePaths().get(position));
+                intent.putExtra("Folder", int_position);
+                intent.putExtra("files",allFolders.get(int_position).getImagePaths());
+                startActivity(intent);
+            }
+        }
+    }
+
+    public static boolean isImageFile(String path)
+    {
+        String mimeType = URLConnection.guessContentTypeFromName(path);
+        return mimeType != null && mimeType.startsWith("image");
+    }
+
+
+    public class MultiChoiceModeListener implements GridView.MultiChoiceModeListener
+    {
+        @SuppressLint("ResourceType")
+        public boolean onCreateActionMode(ActionMode mode, Menu menu)
+        {
+            mode.setTitle("Select items to delete");
+            getMenuInflater().inflate(R.menu.action, menu);
+            _actionMode = mode;
+            return true;
+        }
+
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return true;
+        }
+
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return true;
+        }
+
+        public void onDestroyActionMode(ActionMode mode)
+        {
+            for(int pos : selectedPositions)
+            {
+                gridView.getChildAt(pos).setBackgroundColor(Color.WHITE);
+            }
+            selectedPositions.clear();
+            onRestart();
+        }
+
+
+
+       // @RequiresApi(api = Build.VERSION_CODES.N)
+        @TargetApi(Build.VERSION_CODES.N)
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                              boolean checked)
+        {
+            int firstPosition = gridView.getFirstVisiblePosition();
+            int childPosition = position - firstPosition;
+
+            if(selectedPositions.contains(position))
+            {
+                gridView.getChildAt(childPosition).setBackgroundColor(Color.WHITE);
+                selectedPositions.removeIf(s->s==position);
+            }
+            else
+            {
+                gridView.getChildAt(childPosition).setBackgroundColor(Color.CYAN);
+                selectedPositions.add(position);
+            }
+
+            int selectCount = gridView.getCheckedItemCount();
+
+            switch (selectCount) {
+                case 1:
+                    mode.setSubtitle("One item selected");
+                    break;
+                default:
+                    mode.setSubtitle("" + selectCount + " items selected");
+                    break;
+            }
+        }
     }
 
 }
