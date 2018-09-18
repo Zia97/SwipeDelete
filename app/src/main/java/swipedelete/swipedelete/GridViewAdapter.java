@@ -45,7 +45,8 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
     }
 
     @Override
-    public int getCount() {
+    public int getCount()
+    {
         return al_menu.get(int_position).getImagePaths().size();
     }
 
@@ -109,7 +110,7 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
                             .load(stream.toByteArray())
                             .asBitmap()
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(true)
+                            .skipMemoryCache(false)
                             .into(viewHolder.iv_image);
                     curThumb.recycle();
                 }
@@ -118,7 +119,7 @@ public class GridViewAdapter extends ArrayAdapter<FolderModel> {
                 {
                 Glide.with(context).load(filePath)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .skipMemoryCache(true)
+                        .skipMemoryCache(false)
                         .into(viewHolder.iv_image);
             }
         }

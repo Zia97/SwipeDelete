@@ -163,8 +163,6 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
             currentPositionInPhotoArray = 0;
         }
 
-        Log.e("ret", String.valueOf(currentPositionInPhotoArray));
-
         imagePath = allImagesInFolder.get(currentPositionInPhotoArray);
 
         Glide.with(this.getApplicationContext()).load(allImagesInFolder.get(currentPositionInPhotoArray))

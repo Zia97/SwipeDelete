@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="swipedelete.swipedelete"
-    android:versionCode="4"
+    android:versionCode="7"
     android:versionName="@string/app_name">
 
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+
+
 
     <application
         android:allowBackup="true"
@@ -24,7 +26,7 @@
             </intent-filter>
         </activity>
 
-      //  <activity android:name=".PhotosActivity" android:launchMode="singleTask"></activity>
+        //  <activity android:name=".PhotosActivity" android:launchMode="singleTask"></activity>
         //  <activity android:name=".ImageSwitcher" android:launchMode="singleTask"></activity>
         //  <activity android:name=".VideoSwitcher" android:launchMode="singleTask"></activity>
 
