@@ -1,14 +1,18 @@
 package swipedelete.swipedelete;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -28,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class ImageSwitcher extends AppCompatActivity implements Serializable {
@@ -43,6 +49,11 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
     private GestureDetector gdt;
     private static final int MIN_SWIPPING_DISTANCE = 50;
     private static final int THRESHOLD_VELOCITY = 50;
+    private Menu mOptionsMenu;
+    private boolean autoscrollEnabled;
+    private Timer mTimer1;
+    private TimerTask mTt1;
+    private Handler mTimerHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +61,8 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
         setContentView(R.layout.image_switcher_xml);
         imageView = findViewById(R.id.imageViewXML);
         imageView.setBackgroundColor(Color.rgb(0, 0, 0));
+
+
 
 
         Set<String> imagePaths = getIntent().getCategories();
@@ -88,6 +101,23 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu)
+    {
+        mOptionsMenu = menu;
+        updateOptionsMenu();
+        return true;
+    }
+
+    private void updateOptionsMenu()
+    {
+        if (mOptionsMenu != null) {
+            onPrepareOptionsMenu(mOptionsMenu);
+            getMenuInflater().inflate(R.menu.autoscroll, mOptionsMenu);
+        }
+    }
+
+
 
     private void GetAllImagesInFolder()
     {
@@ -99,6 +129,23 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
                 currentPositionInPhotoArray = i;
             }
         }
+    }
+
+    public void AutoScrollButtonClicked(MenuItem item)
+    {
+        if(autoscrollEnabled)
+        {
+            autoscrollEnabled = false;
+            stopTimer();
+            Toast.makeText(this.getApplicationContext(),"Auto-scroll stopped", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            autoscrollEnabled = true;
+            startTimer();
+            Toast.makeText(this.getApplicationContext(),"Auto-scroll enabled", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     private void LoadImageIntoImageView()
@@ -113,6 +160,7 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
     public void onBackPressed()
     {
         allImagesInFolder.clear();
+        stopTimer();
         finish();
     }
 
@@ -246,5 +294,31 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
             }
             return false;
         }
+    }
+
+    private void stopTimer()
+    {
+        if(mTimer1 != null){
+            mTimer1.cancel();
+            mTimer1.purge();
+        }
+    }
+
+    private void startTimer()
+    {
+        mTimer1 = new Timer();
+        mTt1 = new TimerTask() {
+            public void run() {
+                mTimerHandler.post(new Runnable()
+                {
+                    public void run()
+                    {
+                        GoToNextPicture();
+                    }
+                });
+            }
+        };
+
+        mTimer1.schedule(mTt1, 1, 2000);
     }
 }

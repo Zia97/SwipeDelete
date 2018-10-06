@@ -85,7 +85,8 @@ public class PhotosActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onRestart() {
+    protected void onRestart()
+    {
         super.onRestart();
         filesDeleted = false;
         allFolders.clear();
@@ -360,6 +361,7 @@ public class PhotosActivity extends AppCompatActivity {
 
         // Runs in UI before background thread is called
         @Override
+
         protected void onPreExecute() {
             super.onPreExecute();
             dialog.setMessage("Deleting "+selectedPositions.size()+" files...");
@@ -381,14 +383,14 @@ public class PhotosActivity extends AppCompatActivity {
 
                 boolean deleted = file.delete();
 
-
                 if (!deleted)
                 {
                     Log.e("Error", "File was not deleted");
                 } else
-                    {
+                {
                     sendBroadcast(new Intent(ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
                 }
+
             }
                 try {
 
