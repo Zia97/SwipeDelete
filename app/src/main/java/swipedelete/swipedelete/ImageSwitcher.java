@@ -63,8 +63,6 @@ public class ImageSwitcher extends AppCompatActivity implements Serializable {
         imageView.setBackgroundColor(Color.rgb(0, 0, 0));
 
 
-
-
         Set<String> imagePaths = getIntent().getCategories();
         folderPosition = getIntent().getIntExtra("Folder",0);
 
