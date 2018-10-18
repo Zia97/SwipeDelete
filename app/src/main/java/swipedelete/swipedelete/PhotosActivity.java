@@ -291,7 +291,7 @@ public class PhotosActivity extends AppCompatActivity {
         @SuppressLint("ResourceType")
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.setTitle("Select items to delete");
-            getMenuInflater().inflate(R.menu.action, menu);
+            getMenuInflater().inflate(R.menu.autoscroll, menu);
             _actionMode = mode;
             return true;
         }
