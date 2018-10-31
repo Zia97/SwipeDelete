@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -21,6 +23,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -33,7 +37,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class VideoSwitcher extends AppCompatActivity
+public class VideoSwitcher extends AppCompatActivity implements BillingProcessor.IBillingHandler
 {
     private VideoView videoView;
     private TextView textView;
@@ -53,16 +57,25 @@ public class VideoSwitcher extends AppCompatActivity
     private Timer mTimer1;
     private TimerTask mTt1;
     private Handler mTimerHandler = new Handler();
+    private BillingProcessor bp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.video_switcher_xml);
+        CheckAdds();
+        if(bp.isPurchased("swipedelete.removeads"))
+        {
+            setContentView(R.layout.noads_video_switcher_xml);
+        }
+        else
+        {
+            setContentView(R.layout.video_switcher_xml);
+        }
+
         videoView = findViewById(R.id.videoViewXML);
         textView = findViewById(R.id.vidSize);
         videoView.setBackgroundColor(Color.rgb(0, 0, 0));
         videoView.setZOrderOnTop(true);
-
 
         Set<String> imagePaths = getIntent().getCategories();
         folderPosition = getIntent().getIntExtra("Folder",0);
@@ -97,6 +110,12 @@ public class VideoSwitcher extends AppCompatActivity
                 return true;
             } });
 
+    }
+
+    private void CheckAdds()
+    {
+        bp = new SubBillingProcessor(this, "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj/g4aFc1Snixe61A2v3EhLc3KURs84sLY1eKCqQAb4nJalYxGnDsO0KuiQF/IXv1ZHXew+z+n5A7+FcEbj4+0DJAi9QalMMhxR+g2j0XheN8qAzw45VMdslvvvNfhcKCQKVai9i6FFzlU7FnYl94K5xL9AZkfGuUc7fI54s6eaXnG4tkB0KUXPo1xR0ymq0t7ebWys/l7WDXCYvtFNTlzma05sbgWWaE7gnhtEuV75zo3NLD6fXohQjAWOlwy2OwUd9wlG8LWAKfFvszTu7HOdojuX8VCQhvy0GuJTMuPPWR0T+BKazvBSmbhcqS5VqYBAWd5R+KIncseDtM2g8E0QIDAQAB", this);
+        bp.initialize();
     }
 
     @Override
@@ -153,10 +172,13 @@ public class VideoSwitcher extends AppCompatActivity
 
     private void LoadAdds()
     {
-        //Load adds
-        mAdView = findViewById(R.id.adViewXML);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        if(!bp.isPurchased("swipedelete.removeads"))
+        {
+            //Load adds
+            mAdView = findViewById(R.id.adViewXML);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
+        }
     }
 
     private void GetAllImagesInFolder()
@@ -169,6 +191,41 @@ public class VideoSwitcher extends AppCompatActivity
             {
                 currentPositionInPhotoArray = i;
             }
+        }
+    }
+
+    @Override
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
+
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+
+    }
+
+    @Override
+    public void onBillingError(int errorCode, @Nullable Throwable error) {
+
+    }
+
+    @Override
+    public void onBillingInitialized() {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        if (bp != null) {
+            bp.release();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!bp.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 

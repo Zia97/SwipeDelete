@@ -19,6 +19,8 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -35,10 +37,13 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -46,7 +51,7 @@ import java.util.concurrent.ExecutionException;
 import static android.content.Intent.*;
 
 
-public class PhotosActivity extends AppCompatActivity {
+public class PhotosActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler, Serializable {
     int int_position;
     private GridView gridView;
     GridViewAdapter adapter;
@@ -60,16 +65,20 @@ public class PhotosActivity extends AppCompatActivity {
 
     private boolean filesDeleted;
 
+    SubBillingProcessor bp;
+
 
     private AdView mAdView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         //Removed regen all folders
         filesDeleted = false;
         allFolders = MainActivity.allFolders;
         SetGridView();
+        CheckAdds();
         LoadAdds();
         SetClickListeners();
     }
@@ -81,6 +90,12 @@ public class PhotosActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new OnItemClickListener());
 
         gridView.setMultiChoiceModeListener(multiChoiceModeListener);
+    }
+
+    private void CheckAdds()
+    {
+        bp = new SubBillingProcessor(this, "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj/g4aFc1Snixe61A2v3EhLc3KURs84sLY1eKCqQAb4nJalYxGnDsO0KuiQF/IXv1ZHXew+z+n5A7+FcEbj4+0DJAi9QalMMhxR+g2j0XheN8qAzw45VMdslvvvNfhcKCQKVai9i6FFzlU7FnYl94K5xL9AZkfGuUc7fI54s6eaXnG4tkB0KUXPo1xR0ymq0t7ebWys/l7WDXCYvtFNTlzma05sbgWWaE7gnhtEuV75zo3NLD6fXohQjAWOlwy2OwUd9wlG8LWAKfFvszTu7HOdojuX8VCQhvy0GuJTMuPPWR0T+BKazvBSmbhcqS5VqYBAWd5R+KIncseDtM2g8E0QIDAQAB", this);
+        bp.initialize();
     }
 
 
@@ -102,11 +117,15 @@ public class PhotosActivity extends AppCompatActivity {
         SetClickListeners();
     }
 
-    private void LoadAdds() {
-        //Load adds
-        mAdView = findViewById(R.id.adViewXML);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+    private void LoadAdds()
+    {
+        if(!bp.isPurchased("swipedelete.removeads"))
+        {
+            //Load adds
+            mAdView = findViewById(R.id.adViewXML);
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mAdView.loadAd(adRequest);
+        }
     }
 
     private void SetGridView() {
@@ -263,6 +282,41 @@ public class PhotosActivity extends AppCompatActivity {
         builder.show();
     }
 
+    @Override
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
+
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+
+    }
+
+    @Override
+    public void onBillingError(int errorCode, @Nullable Throwable error) {
+
+    }
+
+    @Override
+    public void onBillingInitialized() {
+
+    }
+
+    @Override
+    public void onDestroy() {
+        if (bp != null) {
+            bp.release();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!bp.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     public class OnItemClickListener implements AdapterView.OnItemClickListener {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (isImageFile(allFolders.get(int_position).getImagePaths().get(position))) {
@@ -291,7 +345,7 @@ public class PhotosActivity extends AppCompatActivity {
         @SuppressLint("ResourceType")
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.setTitle("Select items to delete");
-            getMenuInflater().inflate(R.menu.autoscroll, menu);
+            getMenuInflater().inflate(R.menu.delete, menu);
             _actionMode = mode;
             return true;
         }

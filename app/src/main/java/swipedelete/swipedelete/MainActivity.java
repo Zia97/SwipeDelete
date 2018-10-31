@@ -1,6 +1,10 @@
 package swipedelete.swipedelete;
 
+import android.app.AlertDialog;
 import android.graphics.Path;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.Manifest;
@@ -13,32 +17,41 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
 
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.AdRequest;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BillingProcessor.IBillingHandler, Serializable {
     public static ArrayList<FolderModel> allImageFolders = new ArrayList<>();
     public static ArrayList<String> allImageFoldersAbsolutePaths = new ArrayList<>();
     public static ArrayList<FolderModel> allVideoFolders = new ArrayList<>();
     public static ArrayList<String> allVideoFoldersAbsolutePaths = new ArrayList<>();
     public static ArrayList<FolderModel> allFolders = new ArrayList<>();
 
+    Menu mOptionsMenu;
     boolean boolean_folder;
     boolean onCreateCalled = false;
     Adapter_PhotosFolder obj_adapter;
     GridView gridViewFolderHolder;
     private static final int REQUEST_PERMISSIONS = 100;
+    SubBillingProcessor bp;
+
+    private String removeAds = "swipedelete.removeads";
 
     private AdView mAdView;
 
@@ -48,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
         onCreateCalled = true;
         setContentView(R.layout.activity_main);
         gridViewFolderHolder = findViewById(R.id.gv_folder);
+
+        bp = new SubBillingProcessor(this, "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj/g4aFc1Snixe61A2v3EhLc3KURs84sLY1eKCqQAb4nJalYxGnDsO0KuiQF/IXv1ZHXew+z+n5A7+FcEbj4+0DJAi9QalMMhxR+g2j0XheN8qAzw45VMdslvvvNfhcKCQKVai9i6FFzlU7FnYl94K5xL9AZkfGuUc7fI54s6eaXnG4tkB0KUXPo1xR0ymq0t7ebWys/l7WDXCYvtFNTlzma05sbgWWaE7gnhtEuV75zo3NLD6fXohQjAWOlwy2OwUd9wlG8LWAKfFvszTu7HOdojuX8VCQhvy0GuJTMuPPWR0T+BKazvBSmbhcqS5VqYBAWd5R+KIncseDtM2g8E0QIDAQAB", this);
+        bp.initialize();
 
         //Initialise adds
         MobileAds.initialize(this, "ca-app-pub-1994840857400080/7051857651");
@@ -62,10 +78,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Load adds
-        LoadAdds();
-
         CheckPermissions();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu)
+    {
+        mOptionsMenu = menu;
+        updateOptionsMenu();
+        return true;
+    }
+
+    private void updateOptionsMenu()
+    {
+        if (mOptionsMenu != null) {
+            onPrepareOptionsMenu(mOptionsMenu);
+            getMenuInflater().inflate(R.menu.removeads, mOptionsMenu);
+        }
+    }
+
+    public void removeAdsButtonClicked(MenuItem item)
+    {
+        if(bp.isPurchased("swipedelete.removeads"))
+        {
+            Toast myToat = Toast.makeText(this,"Ads have already been removed!", Toast.LENGTH_LONG);
+            myToat.show();
+        }
+        else {
+                bp.purchase(this, "swipedelete.removeads");
+                onRestart();
+        }
+
     }
 
     @Override
@@ -75,6 +118,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         gridViewFolderHolder = findViewById(R.id.gv_folder);
 
+        bp = new SubBillingProcessor(this, "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj/g4aFc1Snixe61A2v3EhLc3KURs84sLY1eKCqQAb4nJalYxGnDsO0KuiQF/IXv1ZHXew+z+n5A7+FcEbj4+0DJAi9QalMMhxR+g2j0XheN8qAzw45VMdslvvvNfhcKCQKVai9i6FFzlU7FnYl94K5xL9AZkfGuUc7fI54s6eaXnG4tkB0KUXPo1xR0ymq0t7ebWys/l7WDXCYvtFNTlzma05sbgWWaE7gnhtEuV75zo3NLD6fXohQjAWOlwy2OwUd9wlG8LWAKfFvszTu7HOdojuX8VCQhvy0GuJTMuPPWR0T+BKazvBSmbhcqS5VqYBAWd5R+KIncseDtM2g8E0QIDAQAB", this);
+        bp.initialize();
+
         gridViewFolderHolder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -83,9 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
-        LoadAdds();
 
         CheckPermissions();
     }
@@ -250,6 +293,48 @@ public class MainActivity extends AppCompatActivity {
                     FindImagePaths();
                 }
             }
+        }
+    }
+
+    @Override
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details)
+    {
+        onRestart();
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored()
+    {
+
+    }
+
+    @Override
+    public void onBillingError(int errorCode, @Nullable Throwable error)
+    {
+
+    }
+
+    @Override
+    public void onBillingInitialized()
+    {
+        if(!bp.isPurchased(removeAds))
+        {
+            LoadAdds();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (bp != null) {
+            bp.release();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (!bp.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 }
